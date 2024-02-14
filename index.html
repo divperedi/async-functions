@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Asynkron programmering</title>
 </head>
+
 <body>
     <main>
+        <section class="container">
         <form class="search-form" id="sForm">
             <label for="pokemonItem">Which pokemon do you wanna see?</label>
-            <input type="text" name="pokemon" id="pokemonItem">
-            <input type="submit" value="Search" class="search-form__button">
+            <section class="inputs">
+                <input type="text" name="pokemon" id="pokemonItem">
+                <input type="submit" value="Search" class="search-form__button">
+            </section>
         </form>
+        <section class="results">
+            <ul class="results-info__list"></ul>
+        </section>
+    </section>
     </main>
     <script src="./script.js"></script>
 </body>
+
 </html>

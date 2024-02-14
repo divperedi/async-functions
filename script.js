@@ -299,13 +299,15 @@ async function getPokemonDetails(pokemonUrl) {
 }
 
 async function getPokemon() {
+    const resultsContainer = document.querySelector('.results');
+
     const pokemons = await fetchPokemons('https://santosnr6.github.io/Data/pokemons.json');
 
     pokemons.forEach((pokemon) => pokemonsArray.push(pokemon));
     console.log(pokemonsArray);
 
     const formRef = document.querySelector('#sForm');
-    const mainRef = document.querySelector('main');
+    // const mainRef = document.querySelector('main');
 
     formRef.addEventListener('submit', async function (event) {
         event.preventDefault();
@@ -314,13 +316,15 @@ async function getPokemon() {
 
         const foundPokemon = pokemonsArray.find((pokemon) => pokemon.name.toLowerCase() === userInput);
         
+        resultsContainer.innerHTML = '';
+
         if(foundPokemon) {
             const pokemonDetails = await getPokemonDetails(foundPokemon.url);
             console.log(pokemonDetails);
 
-            const pName = document.createElement('p');
-            pName.textContent = `Name: ${foundPokemon.name}`;
-            mainRef.appendChild(pName);
+            const listItem = document.createElement('li');
+            listItem.textContent = `Name: ${foundPokemon.name}`;
+            resultsContainer.appendChild(listItem);
             
             const aRef = document.createElement('a');
 
@@ -329,7 +333,7 @@ async function getPokemon() {
             aRef.textContent = `Details`;
             aRef.target = '_blank';
 
-            mainRef.appendChild(aRef);
+            resultsContainer.appendChild(aRef);
         } else {
             console.log('Pokemon is not found!');
         }

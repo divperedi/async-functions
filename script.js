@@ -262,83 +262,192 @@ async function readBook() {
 
 
 
-// Övning 5
+// Övning 5, 6
+let matchedCharacters = [];
 
-const pokemonsArray = [];
-
-async function fetchPokemons(pokemonsApiString) {
-    try {
-        const response = await fetch(pokemonsApiString);
-
-        if(!response.ok) {
-            throw 'Something weird happen...';
-        }
-
-        const data = await response.json();
-        return data;
-    } catch(error) {
-        console.log(error);
-        return null;
-    }
-}
-
-async function getPokemonDetails(pokemonUrl) {
-    try {
-        const response = await fetch(pokemonUrl);
-
-        if(!response.ok) {
-            throw 'It is impossible to get that pokemon at the moment...';
-        }
-
-        const data = await response.json();
-        return data;
-    } catch(error) {
-        console.log(error);
-        return null;
-    }
-}
-
-async function getPokemon() {
+document.addEventListener('DOMContentLoaded', (event) => {
+    let pokemonsArray = [];
+    let selectedIndex = -1;
+    const inputRef = document.querySelector('#pokemonItem');
     const resultsContainer = document.querySelector('.results');
 
-    const pokemons = await fetchPokemons('https://santosnr6.github.io/Data/pokemons.json');
+    async function fetchPokemons(pokemonsApiString) {
+        try {
+            const response = await fetch(pokemonsApiString);
 
-    pokemons.forEach((pokemon) => pokemonsArray.push(pokemon));
-    console.log(pokemonsArray);
+            if (!response.ok) {
+                throw 'Something weird happen...';
+            }
 
-    const formRef = document.querySelector('#sForm');
-    // const mainRef = document.querySelector('main');
-
-    formRef.addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        const userInput = document.querySelector('#pokemonItem').value.toLowerCase();
-
-        const foundPokemon = pokemonsArray.find((pokemon) => pokemon.name.toLowerCase() === userInput);
-        
-        resultsContainer.innerHTML = '';
-
-        if(foundPokemon) {
-            const pokemonDetails = await getPokemonDetails(foundPokemon.url);
-            console.log(pokemonDetails);
-
-            const listItem = document.createElement('li');
-            listItem.textContent = `Name: ${foundPokemon.name}`;
-            resultsContainer.appendChild(listItem);
-            
-            const aRef = document.createElement('a');
-
-            aRef.textContent = `Here is the pokemon!`;
-            aRef.href = foundPokemon.url;
-            aRef.textContent = `Details`;
-            aRef.target = '_blank';
-
-            resultsContainer.appendChild(aRef);
-        } else {
-            console.log('Pokemon is not found!');
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.log(error);
+            return null;
         }
-    })
+    }
 
-}
+    async function getPokemonDetails(pokemonUrl) {
+        try {
+            const response = await fetch(pokemonUrl);
 
-getPokemon();
+            if (!response.ok) {
+                throw 'It is impossible to get that pokemon at the moment...';
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    }
+
+    async function getPokemon() {
+        const resultsList = document.querySelector('.results-info__list');
+
+        const pokemons = await fetchPokemons('https://santosnr6.github.io/Data/pokemons.json');
+
+        pokemons.forEach((pokemon) => pokemonsArray.push(pokemon));
+        console.log(pokemonsArray);
+
+        const formRef = document.querySelector('#sForm');
+        // const mainRef = document.querySelector('main');
+
+        formRef.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const userInput = document.querySelector('#pokemonItem').value.toLowerCase();
+
+            const foundPokemon = pokemonsArray.find((pokemon) => pokemon.name.toLowerCase() === userInput);
+
+            resultsContainer.innerHTML = '';
+
+            if (foundPokemon) {
+                const pokemonDetails = await getPokemonDetails(foundPokemon.url);
+                console.log(pokemonDetails);
+
+                // const listItem = document.createElement('li');
+                // listItem.textContent = `Name: ${foundPokemon.name}`;
+                // resultsContainer.appendChild(listItem);
+
+                renderPokemonDetails(foundPokemon.url);
+
+                pokemonsArray = await fetchPokemons('https://santosnr6.github.io/Data/pokemons.json');
+                console.log(pokemonsArray);
+
+
+                resultsContainer.style.display = 'flex';
+
+                matchedCharacters = pokemonsArray;
+
+                // const aRef = document.createElement('a');
+
+                // // aRef.textContent = `Here is the pokemon!`;
+                // aRef.href = foundPokemon.url;
+                // aRef.textContent = `Details`;
+                // aRef.target = '_blank';
+
+                // resultsContainer.appendChild(aRef);
+            } else {
+                console.log('Pokemon is not found!');
+                resultsContainer.style.display = 'none';
+            }
+        })
+
+    }
+
+    getPokemon();
+
+    inputRef.addEventListener('input', updateAutoCompleteList);
+    document.addEventListener('keydown', (e) => handleKeyDown(e));
+
+    async function renderPokemonDetails(url) {
+        try {
+            const data = await getPokemonDetails(url);
+
+            let listRef = document.querySelector('.results-info__list');
+            if (!listRef) {
+                listRef = document.createElement('ul');
+                listRef.classList.add('results-info__list');
+                // Assuming you have a container element, replace '.container' with the actual selector
+                document.querySelector('.results').appendChild(listRef);
+            }
+
+            const resultListContent = `
+                <li class="results-info__list-item">Name: ${data.name}</li>
+                <li class="results-info__list-item">Height: ${data.height} cm</li>
+                <li class="results-info__list-item">Weight: ${data.weight} kg</li>
+                <li class="results-info__list-item">Base expirience : ${data.base_experience}</li>
+            `;
+
+            listRef.innerHTML = resultListContent;
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
+    function updateAutoCompleteList(event) {
+        console.log(event.target.value);
+
+        const autoCompleteList = document.querySelector('#autocompleteList');
+        const userInput = event.target.value.toLowerCase();
+
+        if (userInput === '') {
+            matchedCharacters = [];
+            autoCompleteList.innerHTML = '';
+            return;
+        }
+
+        matchedCharacters = pokemonsArray.filter(pokemon => pokemon.name.toLowerCase().includes(userInput)); 
+        console.log(matchedCharacters.length);
+
+        autoCompleteList.innerHTML = '';
+
+        let maxCounter = 10;
+        if (matchedCharacters.length < 10) {
+            maxCounter = matchedCharacters.length;
+        }
+
+        for (let i = 0; i < maxCounter; i++) {
+            const listItemRef = document.createElement('li');
+            listItemRef.textContent = matchedCharacters[i].name;
+            autoCompleteList.appendChild(listItemRef);
+
+            listItemRef.addEventListener('click', () => {
+                renderPokemonDetails(matchedCharacters[i].url);
+                autoCompleteList.innerHTML = '';
+            });
+        }
+    }
+
+    function handleKeyDown(event, matchedCharacters) {
+        const autoCompleteList = document.querySelector('#autocompleteList');
+        const items = autoCompleteList.querySelectorAll('li');
+
+        switch (event.key) {
+            case 'ArrowUp':
+                selectedIndex = Math.max(0, selectedIndex - 1);
+                break;
+            case 'ArrowDown':
+                if (matchedCharacters && matchedCharacters.length > 0) {
+                    selectedIndex = Math.min(matchedCharacters.length - 1, selectedIndex + 1);
+                }
+                break;
+            case 'Enter':
+                if (matchedCharacters && matchedCharacters.length > 0 && selectedIndex !== -1) {
+                    renderPokemonDetails(matchedCharacters[selectedIndex].url);
+                    autoCompleteList.innerHTML = '';
+                }
+                break;
+        }
+
+        items.forEach((item, index) => {
+            item.classList.toggle('selected', index === selectedIndex);
+        });
+    }
+
+    inputRef.addEventListener('keydown', (event) => handleKeyDown(event, matchedCharacters));
+    document.querySelector('#pokemonItem').focus();
+});

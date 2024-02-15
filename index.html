@@ -11,17 +11,19 @@
 <body>
     <main>
         <section class="container">
-        <form class="search-form" id="sForm">
-            <label for="pokemonItem">Which pokemon do you wanna see?</label>
-            <section class="inputs">
-                <input type="text" name="pokemon" id="pokemonItem">
-                <input type="submit" value="Search" class="search-form__button">
+            <form class="search-form" id="sForm">
+                <label for="pokemonItem">Choose your pokemon:</label>
+                <section class="inputs">
+                    <input type="text" name="pokemon" id="pokemonItem">
+                    <input type="submit" value="Search" class="search-form__button">
+                    <ul class="autocomplete-list" id="autocompleteList"></ul>
+                </section>
+            </form>
+            <section class="results">
+                <ul class="results-info__list">
+                </ul>
             </section>
-        </form>
-        <section class="results">
-            <ul class="results-info__list"></ul>
         </section>
-    </section>
     </main>
     <script src="./script.js"></script>
 </body>
